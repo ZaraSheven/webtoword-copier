@@ -1,0 +1,69 @@
+#w2w-tooltip {
+  position: absolute;
+  z-index: 2147483647;
+  background: #1a1a2e;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  white-space: nowrap;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+#w2w-tooltip:hover {
+  background: #16213e;
+}
+
+#w2w-tooltip.loading {
+  background: #2d2d2d;
+  cursor: wait;
+  pointer-events: none;
+}
+
+#w2w-tooltip .w2w-icon {
+  font-size: 15px;
+}
+
+#w2w-tooltip .w2w-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: w2w-spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes w2w-spin {
+  to { transform: rotate(360deg); }
+}
+
+#w2w-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  background: #323232;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+#w2w-toast.show {
+  opacity: 1;
+}

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    width: 360px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    color: #1a1a1a;
+    background: #f4f6fb;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-logo {
+    width: 32px; height: 32px;
+    background: #4f8ef7;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(79,142,247,0.4);
+  }
+  .header-title { font-size: 14px; font-weight: 700; letter-spacing: 0.1px; }
+  .header-sub   { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid #e4e8f0;
+    padding: 0 4px;
+  }
+  .tab {
+    flex: 1; padding: 10px 0;
+    text-align: center; font-size: 12px; font-weight: 500;
+    color: #999; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    margin: 0 2px;
+  }
+  .tab.active { color: #1a1a2e; border-bottom-color: #4f8ef7; }
+
+  /* ── Panel ── */
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  /* ── Section Label ── */
+  .section-label {
+    font-size: 10px; font-weight: 700;
+    color: #aab; text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 8px;
+  }
+
+  /* ── Provider Grid ── */
+  .provider-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    margin-bottom: 16px;
+  }
+  .provider-card {
+    border: 1.5px solid #e4e8f0;
+    border-radius: 10px;
+    padding: 10px 6px 8px;
+    cursor: pointer;
+    background: #fff;
+    text-align: center;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .provider-card:hover {
+    border-color: #4f8ef7;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(79,142,247,0.12);
+  }
+  .provider-card.selected {
+    border-color: #4f8ef7;
+    background: #f0f5ff;
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
+  }
+  .provider-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 4px; right: 6px;
+    font-size: 9px; color: #4f8ef7; font-weight: 700;
+  }
+  .p-icon { font-size: 22px; margin-bottom: 5px; line-height: 1; }
+  .p-name { font-size: 10.5px; font-weight: 600; color: #333; line-height: 1.2; }
+  .p-tag  {
+    font-size: 9px; color: #4f8ef7;
+    background: #e8f0fe; border-radius: 3px;
+    padding: 1px 4px; margin-top: 4px;
+    display: inline-block; font-weight: 500;
+  }
+
+  /* ── Model Select ── */
+  .model-section { margin-bottom: 14px; }
+  .model-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .model-chip {
+    padding: 5px 10px;
+    border: 1.5px solid #e4e8f0;
+    border-radius: 20px;
+    font-size: 11.5px; color: #444;
+    cursor: pointer; background: #fff;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .model-chip:hover { border-color: #4f8ef7; color: #4f8ef7; }
+  .model-chip.selected {
+    border-color: #4f8ef7;
+    background: #4f8ef7; color: #fff;
+    font-weight: 500;
+  }
+  .model-chip .chip-badge {
+    font-size: 9px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 3px; padding: 0 3px;
+    margin-left: 4px; vertical-align: middle;
+  }
+  .model-chip:not(.selected) .chip-badge {
+    background: #f0f0f0; color: #888;
+  }
+
+  /* ── Form ── */
+  .form-group { margin-bottom: 12px; }
+  .form-label {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 5px; font-size: 11px; font-weight: 600;
+    color: #666; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .form-label .badge {
+    font-size: 10px; font-weight: 500; text-transform: none;
+    letter-spacing: 0; color: #fff; border-radius: 4px;
+    padding: 1px 7px;
+  }
+  .badge-ok   { background: #4caf50; }
+  .badge-warn { background: #ff9800; }
+
+  .input-wrap { position: relative; }
+  .input-wrap input { padding-right: 38px; }
+
+  input[type="text"],
+  input[type="password"],
+  select, textarea {
+    width: 100%;
+    border: 1.5px solid #e0e4ed;
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-size: 12.5px;
+    font-family: inherit;
+    color: #1a1a1a;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #4f8ef7;
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
+  }
+  input[readonly] {
+    background: #f8f9fc; color: #999; cursor: default;
+    border-style: dashed;
+  }
+
+  .eye-btn {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #bbb; font-size: 14px; padding: 0; line-height: 1;
+  }
+  .eye-btn:hover { color: #555; }
+
+  /* ── Base URL display ── */
+  .base-url-display {
+    display: flex; align-items: center; gap: 6px;
+    background: #f8f9fc; border: 1.5px dashed #d8dce8;
+    border-radius: 8px; padding: 7px 10px;
+    font-size: 11px; color: #888; font-family: monospace;
+    margin-bottom: 14px; word-break: break-all;
+  }
+  .base-url-display .url-icon { font-size: 12px; flex-shrink: 0; }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; gap: 8px; margin-top: 6px; }
+  .btn {
+    flex: 1; padding: 9px 0;
+    border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: #1a1a2e; color: #fff;
+    box-shadow: 0 2px 8px rgba(26,26,46,0.2);
+  }
+  .btn-primary:hover { background: #0f0f1e; transform: translateY(-1px); }
+  .btn-secondary {
+    background: #fff; color: #444;
+    border: 1.5px solid #e0e4ed;
+  }
+  .btn-secondary:hover { border-color: #4f8ef7; color: #4f8ef7; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    margin-top: 10px; padding: 9px 11px;
+    border-radius: 8px; font-size: 12px;
+    display: none; align-items: center; gap: 7px;
+    line-height: 1.4;
+  }
+  .status-bar.show { display: flex; }
+  .status-bar.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+  .status-bar.error   { background: #fdecea; color: #c62828; border: 1px solid #ffcdd2; }
+  .status-bar.info    { background: #e8f0fe; color: #1565c0; border: 1px solid #bbdefb; }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .status-bar.success .status-dot { background: #4caf50; }
+  .status-bar.error   .status-dot { background: #f44336; }
+  .status-bar.info    .status-dot {
+    background: #4f8ef7;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+  /* ── Advanced Slider ── */
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-row input[type="range"] {
+    flex: 1; padding: 0; border: none; background: none;
+    box-shadow: none; accent-color: #4f8ef7;
+  }
+  .slider-val {
+    font-size: 12px; font-weight: 700;
+    color: #4f8ef7; min-width: 30px; text-align: right;
+  }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: #eaecf2; margin: 14px 0; }
+
+  /* ── About ── */
+  .about-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid #f0f2f8;
+    font-size: 12px;
+  }
+  .about-row:last-child { border-bottom: none; }
+  .about-row .k { color: #999; }
+  .about-row .v { font-weight: 600; color: #1a1a2e; }
+  .about-row .v.green { color: #4caf50; }
+
+  /* ── Tip ── */
+  .tip {
+    background: #f0f5ff; border-radius: 8px;
+    padding: 11px 13px; font-size: 11.5px;
+    color: #555; line-height: 1.7;
+    border-left: 3px solid #4f8ef7;
+    margin-top: 14px;
+  }
+  .tip b { color: #1a1a2e; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">W</div>
+  <div>
+    <div class="header-title">WebToWord Copier</div>
+    <div class="header-sub">Copy web content → paste into Word, perfectly formatted</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-tab="provider">Provider</div>
+  <div class="tab" data-tab="advanced">Advanced</div>
+  <div class="tab" data-tab="about">About</div>
+</div>
+
+<!-- ══ Tab: Provider ══ -->
+<div class="panel active" id="tab-provider">
+
+  <div class="section-label">1 · Choose Provider</div>
+  <div class="provider-grid" id="providerGrid">
+    <div class="provider-card selected" data-provider="opencode">
+      <div class="p-icon">⚡</div>
+      <div class="p-name">OpenCode Zen</div>
+      <div class="p-tag">Default</div>
+    </div>
+    <div class="provider-card" data-provider="openai">
+      <div class="p-icon">🤖</div>
+      <div class="p-name">OpenAI</div>
+      <div class="p-tag">GPT-4o</div>
+    </div>
+    <div class="provider-card" data-provider="deepseek">
+      <div class="p-icon">🔍</div>
+      <div class="p-name">DeepSeek</div>
+      <div class="p-tag">Official</div>
+    </div>
+    <div class="provider-card" data-provider="gemini">
+      <div class="p-icon">✨</div>
+      <div class="p-name">Google Gemini</div>
+      <div class="p-tag">Gemini 2.5</div>
+    </div>
+    <div class="provider-card" data-provider="groq">
+      <div class="p-icon">🚀</div>
+      <div class="p-name">Groq</div>
+      <div class="p-tag">Ultra-fast</div>
+    </div>
+    <div class="provider-card" data-provider="openrouter">
+      <div class="p-icon">🔀</div>
+      <div class="p-name">OpenRouter</div>
+      <div class="p-tag">Multi-model</div>
+    </div>
+    <div class="provider-card" data-provider="custom">
+      <div class="p-icon">🔧</div>
+      <div class="p-name">Custom</div>
+      <div class="p-tag">Any API</div>
+    </div>
+  </div>
+
+  <!-- Base URL display -->
+  <div class="section-label">2 · Endpoint</div>
+  <div class="base-url-display" id="baseUrlDisplay">
+    <span class="url-icon">🔗</span>
+    <span id="baseUrlText">https://opencode.ai/zen/go/v1</span>
+  </div>
+  <!-- Custom URL input (hidden by default) -->
+  <div class="form-group" id="customUrlGroup" style="display:none; margin-top:-8px; margin-bottom:14px;">
+    <input type="text" id="customApiBase" placeholder="https://your-api-endpoint/v1">
+  </div>
+
+  <!-- Model chips -->
+  <div class="section-label">3 · Select Model</div>
+  <div class="model-section">
+    <div class="model-chips" id="modelChips"></div>
+  </div>
+
+  <!-- API Key -->
+  <div class="section-label">4 · API Key</div>
+  <div class="form-group">
+    <div class="form-label">
+      <span>Secret Key</span>
+      <span class="badge badge-warn" id="keyBadge">Not Set</span>
+    </div>
+    <div class="input-wrap">
+      <input type="password" id="apiKey" placeholder="Paste your API key here...">
+      <button class="eye-btn" id="toggleKey">👁</button>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="testBtn">Test Connection</button>
+    <button class="btn btn-primary"   id="saveBtn">Save</button>
+  </div>
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot"></div>
+    <span id="statusMsg"></span>
+  </div>
+</div>
+
+<!-- ══ Tab: Advanced ══ -->
+<div class="panel" id="tab-advanced">
+
+  <div class="form-group">
+    <div class="form-label">Temperature</div>
+    <div class="slider-row">
+      <input type="range" id="temperature" min="0" max="1" step="0.05" value="0.05">
+      <span class="slider-val" id="tempVal">0.05</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="form-label">Max Tokens</div>
+    <select id="maxTokens">
+      <option value="2048">2,048</option>
+      <option value="4096" selected>4,096</option>
+      <option value="8192">8,192</option>
+      <option value="16384">16,384</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <div class="form-label">Request Timeout</div>
+    <select id="timeout">
+      <option value="30">30 seconds</option>
+      <option value="60" selected>60 seconds</option>
+      <option value="120">120 seconds</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="form-group">
+    <div class="form-label">Custom System Prompt</div>
+    <textarea id="customPrompt" rows="5"
+      placeholder="Leave blank to use the built-in conversion prompt. Your text here will fully override the default instructions."
+      style="resize:vertical; line-height:1.55; font-size:12px"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="resetAdvBtn">Reset Defaults</button>
+    <button class="btn btn-primary"   id="saveAdvBtn">Save</button>
+  </div>
+  <div class="status-bar" id="advStatusBar">
+    <div class="status-dot"></div>
+    <span id="advStatusMsg"></span>
+  </div>
+</div>
+
+<!-- ══ Tab: About ══ -->
+<div class="panel" id="tab-about">
+  <div class="about-row">
+    <span class="k">Version</span>
+    <span class="v">2.1.0</span>
+  </div>
+  <div class="about-row">
+    <span class="k">Status</span>
+    <span class="v green" id="about-status">Ready</span>
+  </div>
+  <div class="about-row">
+    <span class="k">Provider</span>
+    <span class="v" id="about-provider">—</span>
+  </div>
+  <div class="about-row">
+    <span class="k">Model</span>
+    <span class="v" id="about-model">—</span>
+  </div>
+  <div class="about-row">
+    <span class="k">Endpoint</span>
+    <span class="v" id="about-base" style="font-size:10px; word-break:break-all; text-align:right; max-width:200px">—</span>
+  </div>
+  <div class="tip">
+    <b>How to use:</b><br>
+    Select any content on a webpage — a floating button appears.
+    Click it, wait ~2 s, then press <b>Ctrl+V</b> in Word.<br><br>
+    <b>Math formulas</b> are converted to native Word OMML and remain
+    fully editable after pasting. No images, no placeholders.
+  </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
