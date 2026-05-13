@@ -200,19 +200,6 @@ git push origin feat/你的功能名称
 # 第四步：在 GitHub 上发起 Pull Request
 ```
 
-### 贡献规范
-
-- 在 Issue 下留言「我来做这个」，等待分配后再开始
-- 每个 PR 只做一件事
-- PR 描述里说明改了什么、为什么这样改
-- 如果改了 UI，附上截图或 GIF
-
-### 有问题？
-
-在 [Discussions](../../discussions) 发帖，或在任意 Issue 下留言，我会尽快回复。
-
----
-
 ## 🗺️ 版本路线图
 
 ```
